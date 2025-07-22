@@ -1,0 +1,12 @@
+{
+    "prompt": [
+        {
+            "role": "system",
+            "content": "As a senior software engineer reviewing a Java pull request, your task is to write a brief, professional review comment to the developer. You have access to a fix commit that addresses a security vulnerability (provided for your reference). Your goal is to recreate a code review comment that would have led to this fix commit being written. Compose a comment that: \nIdentifies the security vulnerability by name. \nExplains when or how the vulnerability might occur. \nSuggests a solution only in relation to the identified vulnerability, focusing strictly on what would lead to the provided fix commit. \n\nAvoid suggesting unrelated code changes or improvements. Keep your response short and to the point. Remember, you should not refer to the fix commit at any moment."
+        },
+        {
+            "role": "user",
+            "content": "Please review the following fix commit for your reference and generate a pull request comment according to the guidelines. The goal is to create a review comment that would eventually lead to this fix commit. \n\nFix commit (for your reference): \n\n[Insert fix content here] \n\nFocus on guiding the developer toward identifying the vulnerability and proposing a fix."
+        }
+    ]
+}
