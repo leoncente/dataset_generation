@@ -1,6 +1,35 @@
 
 from ..os_utils import exists_or_create_folder, exists_file, read_json_file, write_json_file
+from .sonnet import Sonnet
+from .flan import Flan
+from .qwen import Qwen
+from .gpt import Gpt
+from .llm import LLM
 import os
+
+LLM_REGISTRY : dict[str, type[LLM]] = {
+    "OpenAI": Gpt,
+    "Google": Flan,
+    "Qwen": Qwen,
+    "Sonnet": Sonnet
+}
+
+def create_llm(provider: str, model: str) -> LLM:
+    """
+    Create an instance of the LLM based on the provider and model.
+    
+    Args:
+        provider (str): The provider of the model (e.g., "OpenAI", "Google", "Qwen", "Sonnet").
+        model (str): The model identifier.
+    
+    Returns:
+        LLM: An instance of the LLM class for the specified provider and model.
+    """
+    if provider not in LLM_REGISTRY:
+        raise ValueError(f"Provider {provider} is not supported.")
+    
+    llm_class = LLM_REGISTRY[provider]
+    return llm_class(model_name=model)
 
 def get_models(least_expensive: bool = False, OpenAI: bool = True, Google: bool = True, Qwen: bool = True, Sonnet: bool = True) -> dict:
     """
@@ -13,7 +42,7 @@ def get_models(least_expensive: bool = False, OpenAI: bool = True, Google: bool 
     if OpenAI:
         models["OpenAI"] = "gpt-3.5-turbo" if least_expensive else "gpt-4o"
     if Google:
-        models["Google"] = "google/flan-ul2"
+        models["Google"] = "google/flan-t5-small" if least_expensive else "google/flan-ul2"
     if Qwen:
         models["Qwen"] = "Qwen/Qwen3-0.6B" if least_expensive else "Qwen/Qwen3-14B"
     if Sonnet:
@@ -71,3 +100,28 @@ def save_code_review(code_review: str, sha: str, provider: str, model: str, prom
     generated_reviews[provider][model] = code_review
 
     write_json_file(results_folder, f"{sha}.json", generated_reviews)
+
+def get_code_review(sha: str, provider: str, model: str, prompt_name: str, version: str, path: str = "LLMs/Results") -> str:
+    """
+    Retrieve the generated code review for the given parameters.
+    
+    Args:
+        sha (str): The commit SHA.
+        provider (str): The provider of the model.
+        model (str): The model identifier.
+        prompt_name (str): The name of the prompt.
+        version (str): The version of the experiment.
+    
+    Returns:
+        str: The generated code review if it exists, otherwise an empty string.
+    """
+    
+    results_folder = os.path.join(path, version, prompt_name)
+    if not exists_file(results_folder, f"{sha}.json"):
+        raise FileNotFoundError(f"No results found for SHA {sha} in {results_folder}")
+
+    generated_reviews = read_json_file(results_folder, f"{sha}.json")
+    if provider not in generated_reviews or model not in generated_reviews[provider]:
+        raise ValueError(f"No review found for provider {provider} and model {model} in {results_folder}")
+    
+    return generated_reviews[provider][model]

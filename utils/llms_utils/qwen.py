@@ -2,7 +2,38 @@
 # commits with Qwen's model with different prompts using Hugging Face Transformers
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from .llm import LLM
 import torch
+import gc
+
+class Qwen(LLM):
+    """
+    Class to handle the Qwen models for code review generation.
+    """
+    def __init__(self, model_name: str):
+        super().__init__(model_name)
+        self.model_name = model_name
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto")
+        self.model.eval()
+        self.device = self.model.device
+    
+    def end_model(self):
+        del self.model
+        del self.tokenizer
+        for i in range(torch.cuda.device_count()):
+            with torch.cuda.device(i):
+                torch.cuda.empty_cache()
+        gc.collect()
+
+    def generate_cot(self, commit_info: str, prompt: str) -> str:
+        return f'cot {self.model_name}'
+    
+    def generate_self_reflection(self, commit_info: str, prompt: str) -> str:
+        return f'self-reflection {self.model_name}'
+    
+    def generate_zero_shot(self, commit_info: str, prompt: str) -> str:
+        return f'zero-shot {self.model_name}'
 
 def load_qwen(model_name: str):
     tokenizer = AutoTokenizer.from_pretrained(model_name)

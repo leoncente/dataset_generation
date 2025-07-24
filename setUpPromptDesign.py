@@ -14,7 +14,6 @@
 from dotenv import load_dotenv
 import os
 from utils import *
-from utils import Utils
 
 load_dotenv()
 
@@ -53,23 +52,26 @@ for version in versions:
     if not os.path.exists(results_folder):
         os.makedirs(results_folder)
     
-    # Generate the code reviews for each prompt and model
-    # if it has not been done already.
-    for prompt in prompts:
-        # Create a subfolder for the prompt if it does not exist
-        prompt_folder = os.path.join(results_folder, prompt['name'])
-        exists_or_create_folder(prompt_folder)
+    # Iterate over the models
+    for provider, model in models.items():
+        llm = create_llm(provider, model)
 
         for sha in shas:
             # Get the commit info
             commit_info = util.get_commit_info(sha)
-            for provider in models.keys():
-                # Check if the result already exists
-                if generated_prompt_model(sha, provider, models[provider], prompt['name'], version):
-                    continue
 
+            # Generate the code review for all prompts
+            for prompt in prompts:
+                # Check if the result already exists
+                if generated_prompt_model(sha, provider, model, prompt['name'], version):
+                    continue
+                
+                # If the prompt is self-reflection, get the code review from the zero-shot prompt
+                if prompt['name'] == 'self-reflection':
+                    prompt['code_review'] = get_code_review(sha, provider, model, 'zero-shot', version)
+                
                 # Generate the code review
-                code_review = generate_code_review(commit_info, provider, models[provider], prompt, version)
+                code_review = llm.generate(commit_info, prompt)
 
                 # Save the code review
-                save_code_review(code_review, sha, provider, models[provider], prompt['name'], version)
+                save_code_review(code_review, sha, provider, model, prompt['name'], version)

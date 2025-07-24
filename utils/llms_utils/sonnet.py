@@ -1,8 +1,27 @@
 # File to generate code reviews from vulnerability-fixing
 # commits with Anthropic's model with different prompts
-import anthropic
 from dotenv import load_dotenv
+from .llm import LLM
+import anthropic
 import os
+
+class Sonnet(LLM):
+    """
+    Class to handle the Anthropic models for code review generation.
+    """
+    def __init__(self, model_name: str):
+        super().__init__(model_name)
+        load_dotenv()
+        self.client = anthropic.Anthropic(api_key=os.getenv("anthropic_api_key"))
+    
+    def generate_cot(self, commit_info: str, prompt: str) -> str:
+        return f'cot {self.model_name}'
+    
+    def generate_self_reflection(self, commit_info: str, prompt: str) -> str:
+        return f'self-reflection {self.model_name}'
+    
+    def generate_zero_shot(self, commit_info: str, prompt: str) -> str:
+        return f'zero-shot {self.model_name}'
 
 load_dotenv()
 

@@ -2,6 +2,36 @@
 # commits with Google's model with different prompts
 
 from transformers import T5ForConditionalGeneration, AutoTokenizer
+from .llm import LLM
+import torch
+import gc
+
+class Flan(LLM):
+    """
+    Class to handle the Flan models for code review generation.
+    """
+    def __init__(self, model_name: str):
+        super().__init__(model_name)
+        self.model = T5ForConditionalGeneration.from_pretrained(model_name, device_map="auto")
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+    def end_model(self):
+        del self.model
+        del self.tokenizer
+        for i in range(torch.cuda.device_count()):
+            with torch.cuda.device(i):
+                torch.cuda.empty_cache()
+        gc.collect()
+        
+
+    def generate_cot(self, commit_info, prompt):
+        return f'cot {self.model_name}'
+    
+    def generate_self_reflection(self, commit_info, prompt):
+        return f'self-reflection {self.model_name}'
+    
+    def generate_zero_shot(self, commit_info, prompt):
+        return f'zero-shot {self.model_name}'
 
 def ask_flan_ul2(message: list[dict], model: str, enable_thinking: bool) -> str:
     model = T5ForConditionalGeneration.from_pretrained(model, device_map="auto")
