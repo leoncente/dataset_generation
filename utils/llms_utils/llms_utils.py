@@ -15,7 +15,7 @@ def get_models(least_expensive: bool = False, OpenAI: bool = True, Google: bool 
     if Google:
         models["Google"] = "google/flan-ul2"
     if Qwen:
-        models["Qwen"] = "Qwen/Qwen3-0.6B-MLX-6bit" if least_expensive else "Qwen/Qwen3-4B-MLX-bf16"
+        models["Qwen"] = "Qwen/Qwen3-0.6B" if least_expensive else "Qwen/Qwen3-14B"
     if Sonnet:
         models["Sonnet"] = "claude-3-haiku-20240307" if least_expensive else "claude-sonnet-4-20250514"
 

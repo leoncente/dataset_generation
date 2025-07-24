@@ -1,0 +1,8 @@
+python-dotenv
+requests
+psycopg2-binary
+openai
+transformers
+torch
+anthropic
+accelerate

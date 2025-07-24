@@ -2,7 +2,6 @@
 # commits with Google's model with different prompts
 
 from transformers import T5ForConditionalGeneration, AutoTokenizer
-import torch
 
 def ask_flan_ul2(message: list[dict], model: str, enable_thinking: bool) -> str:
     model = T5ForConditionalGeneration.from_pretrained(model, device_map="auto")
@@ -16,8 +15,10 @@ def ask_flan_ul2(message: list[dict], model: str, enable_thinking: bool) -> str:
         )
     else:
         prompt = tokenizer.apply_chat_template(message)
+    
+    device = model.device
 
-    inputs = tokenizer(prompt, return_tensors="pt").input_ids.to("cuda")
+    inputs = tokenizer(prompt, return_tensors="pt").input_ids.to(device)
     outputs = model.generate(inputs, max_length=1024)
     
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
@@ -38,13 +39,14 @@ def generate_flan_ul2(model: str, prompt: dict, commit_details: dict, version: s
 
 
 if __name__ == "__main__":
-    model = T5ForConditionalGeneration.from_pretrained("google/flan-ul2", device_map="auto", load_in_8bit=True)                                                                 
+    model = T5ForConditionalGeneration.from_pretrained("google/flan-ul2", device_map="auto")                                                                 
     tokenizer = AutoTokenizer.from_pretrained("google/flan-ul2")
 
     input_string = "Answer the following question by reasoning step by step. The cafeteria had 23 apples. If they used 20 for lunch, and bought 6 more, how many apple do they have?"                                               
 
-    inputs = tokenizer(input_string, return_tensors="pt").input_ids.to("cuda")
-    outputs = model.generate(inputs, max_length=200)
+    device = model.device
 
-    print(tokenizer.decode(outputs[0]))
-    print(len(tokenizer.decode(outputs[0])))
+    inputs = tokenizer(input_string, return_tensors="pt").input_ids.to(device)
+    outputs = model.generate(inputs, max_length=1024)
+
+    print(tokenizer.decode(outputs[0], skip_special_tokens=True))

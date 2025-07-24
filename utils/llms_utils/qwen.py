@@ -1,30 +1,47 @@
 # File to generate code reviews from vulnerability-fixing
-# commits with Qwen's model with different prompts
+# commits with Qwen's model with different prompts using Hugging Face Transformers
 
-from mlx_lm import load, generate
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
 
-def ask_qwen(message: list[dict], model: str, enable_thinking: bool) -> str:
+def load_qwen(model_name: str):
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto")
+    model.eval()
 
-    model, tokenizer = load(model)
-    if tokenizer.chat_template is not None:
-        prompt = tokenizer.apply_chat_template(
-            message,
-            add_generation_prompt=True,
-            enable_thinking=enable_thinking
+    device = model.device
+
+    return model, tokenizer, device
+
+def ask_qwen(message: list[dict], model_name: str, enable_thinking: bool) -> str:
+    model, tokenizer, device = load_qwen(model_name)
+
+    input_ids = tokenizer.apply_chat_template(
+        message,
+        add_generation_prompt=True,
+        return_tensors="pt",
+        enable_thinking=enable_thinking
+    ).to(device)
+
+    # Create attention_mask manually
+    attention_mask = (input_ids != tokenizer.eos_token_id).long()
+
+    with torch.no_grad():
+        output = model.generate(
+            input_ids=input_ids,
+            max_new_tokens=1024,
+            #do_sample=True,
+            #temperature=0.7,
+            #top_p=0.9,
+            attention_mask=attention_mask
         )
-    response = generate(
-        model,
-        tokenizer,
-        prompt=prompt,
-        verbose=False,
-        max_tokens=1024
-    )
-    return response
+
+    return tokenizer.decode(output[0], skip_special_tokens=True)
 
 def generate_qwen(model: str, prompt: dict, commit_details: dict, version: str) -> str:
     """
     Generate a response using the Qwen model.
-    
+
     Args:
         model (str): The model to use for the request.
         prompt (dict): The prompt to use for the request.
@@ -39,9 +56,10 @@ def generate_qwen(model: str, prompt: dict, commit_details: dict, version: str) 
 if __name__ == "__main__":
     print("Testing Qwen model...")
 
-    model, tokenizer = load("Qwen/Qwen3-0.6B-MLX-6bit")
+    #model_id = "Qwen/Qwen3-0.6B"
+    model_id = "Qwen/Qwen3-14B"
     prompt = "Hello, please introduce yourself and tell me what you can do."
     message = [{"role": "user", "content": prompt}]
 
-    response = ask_qwen(message, "Qwen/Qwen3-0.6B-MLX-6bit", enable_thinking=True)
+    response = ask_qwen(message, model_id, enable_thinking=False)
     print(response)

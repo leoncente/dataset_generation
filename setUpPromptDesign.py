@@ -40,7 +40,7 @@ util = Utils(
 for version in versions:
     # Read the database for vulnerability-fixing commits
     # and randomly select 50 of them or see if they are already selected.
-    shas = util.get_vulnerability_fixes(version, limit=10)
+    shas = util.get_vulnerability_fixes(version, limit=50)
     
     # Read the prompts for the version
     prompts = get_prompts(version)
