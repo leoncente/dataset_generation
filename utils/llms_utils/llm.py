@@ -23,65 +23,27 @@ class LLM:
         """
         raise NotImplementedError("Subclasses should implement this method.")
     
-    def generate(self, commit_info: str, prompt: str) -> str:
+    def generate(self, commit_info: dict, prompt: dict) -> str:
         """
         Call the proper method to generate a code review based on the prompt technique.
 
         Args:
-            commit_info (str): Information about the commit.
-            prompt (str): The input prompt for the LLM.
+            commit_info (dict): Information about the commit.
+            prompt (dict): The prompt to use for code review generation.
 
         Returns:
             str: The generated code review from the LLM.
         """
-        match prompt['name']:
-            case 'cot':
-                return self.generate_cot(commit_info, prompt)
-            case 'self-reflection':
-                return self.generate_self_reflection(commit_info, prompt)
-            case 'zero-shot':
-                return self.generate_zero_shot(commit_info, prompt)
-            case _:
-                raise ValueError(f"Unknown prompt technique: {prompt['name']}")
-        
-    def generate_cot(self, commit_info: str, prompt: str) -> str:
-        """
-        Generate a code review using the Chain of Thought (CoT) technique.
+        commit_text = f'Commit Message: {commit_info['message']}\n\nDiff:\n{commit_info['patch']}'
 
-        Args:
-            commit_info (str): Information about the commit.
-            prompt (str): The input prompt for the LLM.
+        for prompt_element in prompt['prompt']:
+            if prompt_element['role'] == 'user':
+                prompt_element['content'] = prompt_element['content'].replace('[Insert fix content here]', commit_text)
+                
+                if prompt['name'] == 'self-reflection':
+                    prompt_element['content'] = prompt_element['content'].replace('[previous_response]', commit_text)
 
-        Returns:
-            str: The generated code review using CoT.
-        """
-        raise NotImplementedError("Subclasses should implement this method.")
-    
-    def generate_self_reflection(self, commit_info: str, prompt: str) -> str:
-        """
-        Generate a code review using the Self-Reflection technique.
-
-        Args:
-            commit_info (str): Information about the commit.
-            prompt (str): The input prompt for the LLM.
-
-        Returns:
-            str: The generated code review using Self-Reflection.
-        """
-        raise NotImplementedError("Subclasses should implement this method.")
-    
-    def generate_zero_shot(self, commit_info: str, prompt: str) -> str:
-        """
-        Generate a code review using the Zero-Shot technique.
-
-        Args:
-            commit_info (str): Information about the commit.
-            prompt (str): The input prompt for the LLM.
-
-        Returns:
-            str: The generated code review using Zero-Shot.
-        """
-        raise NotImplementedError("Subclasses should implement this method.")
+        return self.ask(message=prompt['prompt'])
     
     def end_model(self):
         """

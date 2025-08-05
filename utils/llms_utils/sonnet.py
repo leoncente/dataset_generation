@@ -14,63 +14,24 @@ class Sonnet(LLM):
         load_dotenv()
         self.client = anthropic.Anthropic(api_key=os.getenv("anthropic_api_key"))
     
-    def generate_cot(self, commit_info: str, prompt: str) -> str:
-        return f'cot {self.model_name}'
-    
-    def generate_self_reflection(self, commit_info: str, prompt: str) -> str:
-        return f'self-reflection {self.model_name}'
-    
-    def generate_zero_shot(self, commit_info: str, prompt: str) -> str:
-        return f'zero-shot {self.model_name}'
+    def ask(self, message: list[dict], max_length: int = 1024) -> str:
+        """
+        Generate a response from the Anthropic model based on the input message.
+        
+        Args:
+            message (list[dict]): The input message for the LLM.
+            max_length (int): The maximum length of the generated response.
 
-load_dotenv()
+        Returns:
+            str: The generated response from the LLM.
+        """
+        input_message = [m for m in message if m.get('role') == 'user']
+        instruction = next((m['content'] for m in message if m.get('role') == 'system'), '')
 
-anthropic_api_key = os.getenv("anthropic_api_key")
-client = anthropic.Anthropic(api_key=anthropic_api_key)
-
-def ask_anthropic(message: list[dict], model: str) -> str:
-    """
-    Ask Anthropic's model with a message and return the response.
-    
-    Args:
-        message (list[dict]): The message to send to the model.
-        model (str): The model to use for the request.
-    
-    Returns:
-        str: The response from the model.
-    """
-    response = client.messages.create(
-        max_tokens=1000,
-        model=model,
-        #system="You are a helpful assistant.",
-        messages=message
-    )
-    return response.content[0].text if response.content else ""
-
-def generate_anthropic(model: str, prompt: dict, commit_details: dict, version: str) -> str:
-    """
-    Generate a response using the Anthropic model.
-    
-    Args:
-        model (str): The model to use for the request.
-        prompt (dict): The prompt to use for the request.
-        commit_details (dict): The commit details to include in the request.
-        version (str): The version of the experiment.
-
-    Returns:
-        str: The generated response from the model.
-    """
-    return ''
-
-if __name__ == "__main__":
-    print("Testing Anthropic API Key...")
-
-    model = "claude-opus-4-20250514"
-    message = [
-        {
-            "role": "user",
-            "content": "Why is the ocean salty?"
-        }
-    ]
-
-    print(ask_anthropic(message, model))
+        response = self.client.messages.create(
+            max_tokens=max_length,
+            model=self.model_name,
+            messages=input_message,
+            system=instruction,
+        )
+        return response.content[0].text if response.content else ""

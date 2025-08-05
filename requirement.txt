@@ -6,3 +6,4 @@ transformers
 torch
 anthropic
 accelerate
+bitsandbytes

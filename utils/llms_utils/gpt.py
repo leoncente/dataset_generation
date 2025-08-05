@@ -14,64 +14,25 @@ class Gpt(LLM):
         load_dotenv()
         self.client = OpenAI(api_key=os.getenv("OpenAI_API_KEY"))
     
-    def generate_cot(self, commit_info: str, prompt: str) -> str:
-        return f'cot {self.model_name}'
-    
-    def generate_self_reflection(self, commit_info: str, prompt: str) -> str:
-        return f'self-reflection {self.model_name}'
-    
-    def generate_zero_shot(self, commit_info: str, prompt: str) -> str:
-        return f'zero-shot {self.model_name}'
+    def ask(self, message: list[dict], max_length: int = 1024) -> str:
+        """
+        Generate a response from the OpenAI model based on the input message.
+        
+        Args:
+            message (list[dict]): The input message for the LLM.
+            max_length (int): The maximum length of the generated response.
 
-OpenAI_API_Key = os.getenv("OpenAI_API_KEY")
-client = OpenAI(api_key=OpenAI_API_Key)
+        Returns:
+            str: The generated response from the LLM.
+        """
+        
+        input_message = next((m['content'] for m in message if m.get('role') == 'user'), '')
+        instruction = next((m['content'] for m in message if m.get('role') == 'system'), '')
 
-def ask_openai(message: list[dict], model: str) -> str:
-    """
-    Ask OpenAI's model with a message and return the response.
-    
-    Args:
-        message (list[dict]): The message to send to the model.
-        model (str): The model to use for the request.
-    
-    Returns:
-        str: The response from the model.
-    """
-    response = client.responses.create(
-        model=model,
-        input=message
-    )
-    return response.output_text
-
-def generate_openai(model: str, prompt: dict, commit_details: dict, version: str) -> str:
-    """
-    Generate a response using the OpenAI model.
-    
-    Args:
-        model (str): The model to use for the request.
-        prompt (dict): The prompt to use for the request.
-        commit_details (dict): The commit details to include in the request.
-        version (str): The version of the experiment.
-
-    Returns:
-        str: The response from the model.
-    """
-    return ''
-
-
-if __name__ == "__main__":
-    print("Testing OpenAI API Key...")
-
-    model = "gpt-4o"
-    message = [
-        {
-            "role": "developer",
-            "content": "Talk like a pirate."
-        },
-        {
-            "role": "user",
-            "content": "Are semicolons optional in JavaScript? answer with one word."
-        }
-    ]
-
-    print(ask_openai(message, model))
+        response = self.client.responses.create(
+            model=self.model_name,
+            input=input_message,
+            max_output_tokens=max_length,
+            instructions=instruction,
+        )
+        return response.output_text

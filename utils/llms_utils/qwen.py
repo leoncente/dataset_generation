@@ -1,7 +1,7 @@
 # File to generate code reviews from vulnerability-fixing
 # commits with Qwen's model with different prompts using Hugging Face Transformers
 
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from .llm import LLM
 import torch
 import gc
@@ -14,83 +14,70 @@ class Qwen(LLM):
         super().__init__(model_name)
         self.model_name = model_name
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto")
+        quantization_config = BitsAndBytesConfig(
+            load_in_8_bit=True)
+        self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", quantization_config=quantization_config)
         self.model.eval()
         self.device = self.model.device
     
     def end_model(self):
         del self.model
         del self.tokenizer
+        gc.collect()
+        torch.cuda.empty_cache()
         for i in range(torch.cuda.device_count()):
             with torch.cuda.device(i):
                 torch.cuda.empty_cache()
-        gc.collect()
 
-    def generate_cot(self, commit_info: str, prompt: str) -> str:
-        return f'cot {self.model_name}'
-    
-    def generate_self_reflection(self, commit_info: str, prompt: str) -> str:
-        return f'self-reflection {self.model_name}'
-    
-    def generate_zero_shot(self, commit_info: str, prompt: str) -> str:
-        return f'zero-shot {self.model_name}'
+    def ask(self, message: list[dict], enable_thinking: bool = False, max_length: int = 1024) -> str:
+        """
+        Generate a response from the Qwen model based on the input message.
+        
+        Args:
+            message (list[dict]): The input message for the LLM.
+            enable_thinking (bool): Whether to enable thinking in the response.
+            max_length (int): The maximum length of the generated response.
 
-def load_qwen(model_name: str):
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto")
-    model.eval()
+        Returns:
+            str: The generated response from the LLM.
+        """
+        input_ids = self.tokenizer.apply_chat_template(
+            message,
+            add_generation_prompt=True,
+            return_tensors="pt",
+            enable_thinking=enable_thinking
+        ).to(self.device)
 
-    device = model.device
+        # Create attention_mask manually
+        attention_mask = (input_ids != self.tokenizer.eos_token_id).long()
 
-    return model, tokenizer, device
+        with torch.no_grad():
+            output = self.model.generate(
+                input_ids=input_ids,
+                max_new_tokens=max_length,
+                attention_mask=attention_mask
+            )
 
-def ask_qwen(message: list[dict], model_name: str, enable_thinking: bool) -> str:
-    model, tokenizer, device = load_qwen(model_name)
+        return self.tokenizer.decode(output[0], skip_special_tokens=True)
 
-    input_ids = tokenizer.apply_chat_template(
-        message,
-        add_generation_prompt=True,
-        return_tensors="pt",
-        enable_thinking=enable_thinking
-    ).to(device)
+    def generate(self, commit_info, prompt):
+        """
+        Call the proper method to generate a code review based on the prompt technique.
 
-    # Create attention_mask manually
-    attention_mask = (input_ids != tokenizer.eos_token_id).long()
+        Args:
+            commit_info (dict): Information about the commit.
+            prompt (dict): The prompt to use for code review generation.
 
-    with torch.no_grad():
-        output = model.generate(
-            input_ids=input_ids,
-            max_new_tokens=1024,
-            #do_sample=True,
-            #temperature=0.7,
-            #top_p=0.9,
-            attention_mask=attention_mask
-        )
+        Returns:
+            str: The generated code review from the LLM.
+        """
+        commit_text = f'Commit Message: {commit_info["message"]}\n\nDiff:\n{commit_info["patch"]}'
 
-    return tokenizer.decode(output[0], skip_special_tokens=True)
+        for prompt_element in prompt['prompt']:
+            if prompt_element['role'] == 'user':
+                prompt_element['content'] = prompt_element['content'].replace('[Insert fix content here]', commit_text)
+                
+                if prompt['name'] == 'self-reflection':
+                    prompt_element['content'] = prompt_element['content'].replace('[previous_response]', commit_text)
 
-def generate_qwen(model: str, prompt: dict, commit_details: dict, version: str) -> str:
-    """
-    Generate a response using the Qwen model.
-
-    Args:
-        model (str): The model to use for the request.
-        prompt (dict): The prompt to use for the request.
-        commit_details (dict): The commit details to include in the request.
-        version (str): The version of the experiment.
-
-    Returns:
-        str: The generated response from the model.
-    """
-    return ''
-
-if __name__ == "__main__":
-    print("Testing Qwen model...")
-
-    #model_id = "Qwen/Qwen3-0.6B"
-    model_id = "Qwen/Qwen3-14B"
-    prompt = "Hello, please introduce yourself and tell me what you can do."
-    message = [{"role": "user", "content": prompt}]
-
-    response = ask_qwen(message, model_id, enable_thinking=False)
-    print(response)
+        return self.ask(message=prompt['prompt'], enable_thinking= prompt['name'] == 'cot')
