@@ -10,17 +10,18 @@ class Sonnet(LLM):
     Class to handle the Anthropic models for code review generation.
     """
     def __init__(self, model_name: str):
-        super().__init__(model_name)
+        super().__init__(model_name, retry_max=5)
         load_dotenv()
         self.client = anthropic.Anthropic(api_key=os.getenv("anthropic_api_key"))
     
-    def ask(self, message: list[dict], max_length: int = 1024) -> str:
+    def ask(self, message: list[dict], max_length: int = 1024, name: str = 'zero-shot') -> str:
         """
         Generate a response from the Anthropic model based on the input message.
         
         Args:
             message (list[dict]): The input message for the LLM.
             max_length (int): The maximum length of the generated response.
+            name (str): The name of the prompt technique.
 
         Returns:
             str: The generated response from the LLM.

@@ -14,6 +14,9 @@
 from dotenv import load_dotenv
 import os
 from utils import *
+import copy
+import pandas as pd
+import shutil
 
 load_dotenv()
 
@@ -39,13 +42,13 @@ util = Utils(
 for version in versions:
     # Read the database for vulnerability-fixing commits
     # and randomly select 50 of them or see if they are already selected.
-    shas = util.get_vulnerability_fixes(version, limit=5)
+    shas = util.get_vulnerability_fixes(version, limit=10)
     
     # Read the prompts for the version
     prompts = get_prompts(version)
 
     # Read the available models
-    models = get_models(least_expensive=True)
+    models = get_models(least_expensive=False)
 
     # Create the results folder if it does not exist
     results_folder = f"LLMs/Results/{version}"
@@ -54,14 +57,18 @@ for version in versions:
     
     # Iterate over the models
     for provider, model in models.items():
+        print(f"Running prompts for {provider} - {model}")
         llm = create_llm(provider, model)
 
         for sha in shas:
+            print(f'Iterating over sha {sha}')
             # Get the commit info
             commit_info = util.get_commit_info(sha)
 
             # Generate the code review for all prompts
-            for prompt in prompts:
+            for original_prompt in prompts:
+                prompt = copy.deepcopy(original_prompt)
+                print(f'Using prompt {prompt["name"]}')
                 # Check if the result already exists
                 if generated_prompt_model(sha, provider, model, prompt['name'], version):
                     continue
@@ -71,7 +78,50 @@ for version in versions:
                     prompt['code_review'] = get_code_review(sha, provider, model, 'zero-shot', version)
                 
                 # Generate the code review
-                code_review = llm.generate(commit_info, prompt)
+                code_review, prompt_used = llm.generate(commit_info, prompt)
 
                 # Save the code review
-                save_code_review(code_review, sha, provider, model, prompt['name'], version)
+                save_code_review(code_review, sha, provider, model, prompt['name'], version, prompt_used=prompt_used)
+
+            print(f'-'*100)
+        
+        llm.end_model()
+
+    # Compile the results in a pandas DataFrame
+    headers = ['url']
+    for prompt in prompts:
+        for provider, model in models.items():
+            headers.append(f"{model}_{prompt['name']}")
+
+    dataFrame = pd.DataFrame(columns=headers)
+    for sha in shas:
+        commit_info = util.get_commit_info(sha)
+
+        raw_url = commit_info.get("raw_url", "")
+        parts = raw_url.split("/")
+        owner = parts[3]
+        repo = parts[4]
+
+        data = {
+            "url": f'https://github.com/{owner}/{repo}/commit/{sha}'
+        }
+
+        for prompt in prompts:
+            code_reviews = get_code_reviews(sha, prompt['name'], version)
+
+            for provider, model in models.items():
+                review = code_reviews[provider][model]
+
+                data[f"{model}_{prompt['name']}"] = review
+
+        dataFrame = pd.concat([dataFrame, pd.DataFrame([data])], ignore_index=True)
+
+    # Save the DataFrame to a CSV file
+    dataFrame.to_csv(f"LLMs/Results/{version}/results.csv", index=False)
+
+    # Zip the folder
+    # if it exists delete it
+    if os.path.exists(f"LLMs/Results/{version}/results-{version}"):
+        shutil.rmtree(f"LLMs/Results/{version}/results-{version}")
+
+    shutil.make_archive(f"LLMs/Results/{version}/results-{version}", 'zip', f"LLMs/Results/{version}")

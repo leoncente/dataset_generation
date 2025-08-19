@@ -2,11 +2,11 @@
     "prompt": [
         {
             "role": "system",
-            "content": "You are a senior software engineer reflecting on a code review."
+            "content": "You are a senior software engineer reflecting on a code review you previously generated, the goal was to create a review comment that would have triggered the fix commit provided. Only respond with the improved review comment."
         },
         {
             "role": "user",
-            "content": "Reflect on your previous response regarding the following fix commit:\n\n{fix}\n\nHere is your previous review of the fix commit:\n\n[previous_response]\n\nEvaluate whether your review closely resembles a real code review, providing actionable feedback in a professional tone. Ensure that it avoids conversational phrases like 'thank you' or 'I appreciate' and instead focuses on concise and direct comments. Check if your review addresses key issues, such as security vulnerabilities or code improvements, and offers clear suggestions for resolution. \n\nIf the review was incomplete or too conversational, provide a revised response that adheres to these guidelines. If the review was thorough and professional, confirm this. Remember, you should not refer to the fix commit at any moment."
+            "content": "Reflect on your previous response regarding the following fix commit:\n\n[Insert fix content here]\n\nHere is your previous review of the fix commit:\n\n[previous_response]\n\nEvaluate whether your review closely resembles a real code review, providing actionable feedback in a professional tone. Check if your review addresses key issues, such as security vulnerabilities and offers clear suggestions for resolution. \n\nIf the review was incomplete or too conversational, provide a revised response that adheres to these guidelines. If the review had no issues simply generate the same review."
         }
     ]
 }

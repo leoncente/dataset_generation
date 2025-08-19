@@ -1,6 +1,6 @@
 from .os_utils import exists_or_create_folder
 from .utils import Utils
-from .llms_utils.llms_utils import get_models, generated_prompt_model, save_code_review, create_llm, get_code_review
+from .llms_utils.llms_utils import get_models, generated_prompt_model, save_code_review, create_llm, get_code_review, get_code_reviews
 from .llms_utils.llm import LLM
 
 def get_prompts(version: str, path: str = "LLMs/Prompts") -> list[dict]:
@@ -22,6 +22,7 @@ __all__ = [
     'generated_prompt_model',
     'save_code_review',
     'get_code_review',
+    'get_code_reviews',
     'create_llm',
     'LLM'
 ]

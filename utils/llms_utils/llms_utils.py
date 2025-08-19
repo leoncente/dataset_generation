@@ -5,6 +5,7 @@ from .flan import Flan
 from .qwen import Qwen
 from .gpt import Gpt
 from .llm import LLM
+import json
 import os
 
 LLM_REGISTRY : dict[str, type[LLM]] = {
@@ -40,7 +41,7 @@ def get_models(least_expensive: bool = False, OpenAI: bool = True, Google: bool 
     """
     models = {}
     if OpenAI:
-        models["OpenAI"] = "gpt-3.5-turbo" if least_expensive else "gpt-4o"
+        models["OpenAI"] = "gpt-3.5-turbo" if least_expensive else "gpt-5"
     if Google:
         models["Google"] = "google/flan-t5-small" if least_expensive else "google/flan-ul2"
     if Qwen:
@@ -72,12 +73,12 @@ def generated_prompt_model(sha: str, provider: str, model: str, prompt_name: str
         return False
     
     generated_review = read_json_file(results_folder, f"{sha}.json")
-    if provider not in generated_review or model not in generated_review[provider] or generated_review[provider][model] is None:
+    if provider not in generated_review or model not in generated_review[provider] or generated_review[provider][model] is None or generated_review[provider][model] == "":
         return False
 
     return True
 
-def save_code_review(code_review: str, sha: str, provider: str, model: str, prompt_name: str, version: str, path: str = "LLMs/Results"):
+def save_code_review(code_review: str, sha: str, provider: str, model: str, prompt_name: str, version: str, path: str = "LLMs/Results", prompt_used: str = None):
     """
     Save the generated code review to a file.
     
@@ -87,6 +88,8 @@ def save_code_review(code_review: str, sha: str, provider: str, model: str, prom
         model (str): The model identifier.
         prompt_name (str): The name of the prompt.
         version (str): The version of the experiment.
+        path (str): The base path where results are stored.
+        prompt_used (str): The name of the prompt used for generation.
     """
     
     results_folder = os.path.join(path, version, prompt_name)
@@ -98,6 +101,21 @@ def save_code_review(code_review: str, sha: str, provider: str, model: str, prom
 
     generated_reviews[provider] = generated_reviews.get(provider, {})
     generated_reviews[provider][model] = code_review
+
+    if prompt_used:
+        if "prompt_used" in generated_reviews:
+            p1 = json.dumps(generated_reviews["prompt_used"])
+            p2 = json.dumps(prompt_used)
+            if p1 != p2:
+                if prompt_name == "self-reflection":
+                    generated_reviews[provider]["prompt_used"] = prompt_used
+                else:
+                    raise ValueError(f"Prompt used does not match existing prompt")
+            del generated_reviews["prompt_used"]
+        if prompt_name != "self-reflection":
+            generated_reviews["prompt_used"] = prompt_used
+        else:
+            generated_reviews[provider]["prompt_used"] = prompt_used
 
     write_json_file(results_folder, f"{sha}.json", generated_reviews)
 
@@ -125,3 +143,23 @@ def get_code_review(sha: str, provider: str, model: str, prompt_name: str, versi
         raise ValueError(f"No review found for provider {provider} and model {model} in {results_folder}")
     
     return generated_reviews[provider][model]
+
+def get_code_reviews(sha: str, prompt_name: str, version: str, path: str = "LLMs/Results") -> dict:
+    """
+    Retrieve all code reviews for a specific SHA and prompt name.
+    
+    Args:
+        sha (str): The commit SHA.
+        prompt_name (str): The name of the prompt.
+        version (str): The version of the experiment.
+        path (str): The base path where results are stored.
+    
+    Returns:
+        dict: A dictionary containing code reviews for all providers and models.
+    """
+    
+    results_folder = os.path.join(path, version, prompt_name)
+    if not exists_file(results_folder, f"{sha}.json"):
+        raise FileNotFoundError(f"No results found for SHA {sha} in {results_folder}")
+
+    return read_json_file(results_folder, f"{sha}.json")

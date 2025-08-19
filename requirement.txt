@@ -7,3 +7,4 @@ torch
 anthropic
 accelerate
 bitsandbytes
+pandas

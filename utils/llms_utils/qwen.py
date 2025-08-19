@@ -29,7 +29,7 @@ class Qwen(LLM):
             with torch.cuda.device(i):
                 torch.cuda.empty_cache()
 
-    def ask(self, message: list[dict], enable_thinking: bool = False, max_length: int = 1024) -> str:
+    def ask(self, message: list[dict], enable_thinking: bool = False, max_length: int = 1024, name: str = 'zero-shot') -> str:
         """
         Generate a response from the Qwen model based on the input message.
         
@@ -37,6 +37,7 @@ class Qwen(LLM):
             message (list[dict]): The input message for the LLM.
             enable_thinking (bool): Whether to enable thinking in the response.
             max_length (int): The maximum length of the generated response.
+            name (str): The name of the prompt technique.
 
         Returns:
             str: The generated response from the LLM.
@@ -45,7 +46,7 @@ class Qwen(LLM):
             message,
             add_generation_prompt=True,
             return_tensors="pt",
-            enable_thinking=enable_thinking
+            enable_thinking= (name == 'cot')
         ).to(self.device)
 
         # Create attention_mask manually
@@ -58,26 +59,11 @@ class Qwen(LLM):
                 attention_mask=attention_mask
             )
 
-        return self.tokenizer.decode(output[0], skip_special_tokens=True)
+        text = self.tokenizer.decode(output[0], skip_special_tokens=True)
 
-    def generate(self, commit_info, prompt):
-        """
-        Call the proper method to generate a code review based on the prompt technique.
+        text = text.split('<think>')[-1] if '</think>' not in text else text
+        text = text.split('</think>')[-1] if '</think>' in text else text
+        # Remove all \n at the start of the text
+        text = text.lstrip('\n')
 
-        Args:
-            commit_info (dict): Information about the commit.
-            prompt (dict): The prompt to use for code review generation.
-
-        Returns:
-            str: The generated code review from the LLM.
-        """
-        commit_text = f'Commit Message: {commit_info["message"]}\n\nDiff:\n{commit_info["patch"]}'
-
-        for prompt_element in prompt['prompt']:
-            if prompt_element['role'] == 'user':
-                prompt_element['content'] = prompt_element['content'].replace('[Insert fix content here]', commit_text)
-                
-                if prompt['name'] == 'self-reflection':
-                    prompt_element['content'] = prompt_element['content'].replace('[previous_response]', commit_text)
-
-        return self.ask(message=prompt['prompt'], enable_thinking= prompt['name'] == 'cot')
+        return text

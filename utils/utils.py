@@ -78,10 +78,10 @@ class Utils:
         # If we don't have enough shas, get more from the database
         more_shas = self.db.get_vulnerability_fixes(version)
 
-        # Add the new shas to the existing ones, ensuring we don't exceed 50
-        shas = list(set(shas))
+        # Add the new shas to the existing ones
+        shas = list(dict.fromkeys(shas))
         shas.extend(more_shas)
-        shas = list(set(shas))
+        shas = list(dict.fromkeys(shas))
         if limit > 0:
             shas = shas[:limit]
 
