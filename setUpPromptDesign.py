@@ -31,6 +31,10 @@ db_name = os.getenv("db_name")
 folder = "LLMs/Prompts"
 versions = [v for v in os.listdir(folder) if os.path.isdir(os.path.join(folder, v))]
 
+versions.sort()
+last_version = versions[-1]
+versions = [last_version]  # For now, only run the last version
+
 util = Utils(
     db_host=db_host,
     db_user=db_user,
@@ -42,7 +46,7 @@ util = Utils(
 for version in versions:
     # Read the database for vulnerability-fixing commits
     # and randomly select 50 of them or see if they are already selected.
-    shas = util.get_vulnerability_fixes(version, limit=10)
+    shas = util.get_vulnerability_fixes(version, limit=100)
     
     # Read the prompts for the version
     prompts = get_prompts(version)
@@ -120,8 +124,7 @@ for version in versions:
     dataFrame.to_csv(f"LLMs/Results/{version}/results.csv", index=False)
 
     # Zip the folder
-    # if it exists delete it
-    if os.path.exists(f"LLMs/Results/{version}/results-{version}"):
-        shutil.rmtree(f"LLMs/Results/{version}/results-{version}")
+    if os.path.exists(f"LLMs/Results/{version}/results-{version}.zip"):
+        os.remove(f"LLMs/Results/{version}/results-{version}.zip")
 
-    shutil.make_archive(f"LLMs/Results/{version}/results-{version}", 'zip', f"LLMs/Results/{version}")
+    shutil.make_archive(f"LLMs/Results/results-{version}", 'zip', f"LLMs/Results/{version}")

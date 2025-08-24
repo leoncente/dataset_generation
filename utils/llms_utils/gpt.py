@@ -10,7 +10,7 @@ class Gpt(LLM):
     Class to handle the OpenAI models for code review generation.
     """
     def __init__(self, model_name: str):
-        super().__init__(model_name, retry_max=5)
+        super().__init__(model_name)
         load_dotenv()
         self.client = OpenAI(api_key=os.getenv("OpenAI_API_KEY"))
     
@@ -30,9 +30,9 @@ class Gpt(LLM):
         input_message = next((m['content'] for m in message if m.get('role') == 'user'), '')
         instruction = next((m['content'] for m in message if m.get('role') == 'system'), '')
 
-        reasoning = {"effort": "low"}
-        if name == 'cot':
-            reasoning = {"effort": "medium"}
+        reasoning = {"effort": "medium"}
+        if name == 'zero-shot':
+            reasoning = {"effort": "low"}
         response = self.client.responses.create(
             reasoning=reasoning,
             model=self.model_name,

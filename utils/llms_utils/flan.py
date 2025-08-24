@@ -43,13 +43,12 @@ class Flan(LLM):
             with torch.cuda.device(i):
                 torch.cuda.empty_cache()
 
-    def ask(self, message: list[dict], enable_thinking: bool = False, max_length: int = 1024, name: str = 'zero-shot') -> str:
+    def ask(self, message: list[dict], max_length: int = 1024, name: str = 'zero-shot') -> str:
         """
         Generate a response from the Flan model based on the input message.
         
         Args:
             message (list[dict]): The input message for the LLM.
-            enable_thinking (bool): Whether to enable thinking in the response.
             max_length (int): The maximum length of the generated response.
             name (str): The name of the prompt technique.
 
@@ -60,7 +59,7 @@ class Flan(LLM):
             prompt = self.tokenizer.apply_chat_template(
                 message,
                 add_generation_prompt=True,
-                enable_thinking=enable_thinking
+                enable_thinking= (name != 'zero-shot')
             )
         else:
             prompt = "\n".join([f"{m['role']}: {m['content']}" for m in message])

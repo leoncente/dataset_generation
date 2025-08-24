@@ -5,7 +5,7 @@ class LLM:
     This class should be extended by specific LLM implementations.
     """
     
-    def __init__(self, model_name: str, retry_max: int = 15):
+    def __init__(self, model_name: str, retry_max: int = 5):
         self.model_name = model_name
         self.retry_max = retry_max
 
@@ -38,9 +38,9 @@ class LLM:
         """
         commit_text = f'Commit Message: {commit_info['message']}\n\nDiff:\n{commit_info['patch']}'
 
-        max_length = 1024
-        if prompt['name'] == 'cot':
-            max_length = 3072
+        max_length = 3072
+        if prompt['name'] == 'zero-shot':
+            max_length = 1024
         for prompt_element in prompt['prompt']:
             if prompt_element['role'] == 'user':
                 prompt_element['content'] = prompt_element['content'].replace('[Insert fix content here]', commit_text)
@@ -50,7 +50,7 @@ class LLM:
         
         retry_count = 0
         while retry_count < self.retry_max:
-            text = self.ask(message=prompt['prompt'], name=prompt['name'], max_length=max_length)
+            text = self.ask(message=prompt['prompt'], name=prompt['name'], max_length=max_length*(1+retry_count))
             text = text.strip()
             if text != '' and text != None:
                 break
