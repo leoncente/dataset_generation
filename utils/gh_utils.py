@@ -66,6 +66,7 @@ def get_commit_details(owner: str, repo: str, sha: str) -> dict:
                 file_response = requests.get(raw_url)
                 if file_response.status_code == 200:
                     file_response = file_response.text
+                    break
                 else:
                     raise Exception(f"Failed to fetch file content for {owner}/{repo} with sha {sha}:\n {file['filename']}")
 
