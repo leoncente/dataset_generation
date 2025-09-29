@@ -1,0 +1,20 @@
+races
+leak
+dead lock
+dead-lock
+deadlocks
+stack overflow
+recursion
+unauthorized
+TOCTOU
+CVE
+vuln
+xsrf
+xxe
+zip slip
+zipslip
+malicious
+malicious code
+sql injection
+sqli
+code injection

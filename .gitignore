@@ -3,6 +3,7 @@ venv/
 LLMs/Results/
 tmp.py
 tmp/
+tmps/
 
 # Ignore Python cache files
 __pycache__/

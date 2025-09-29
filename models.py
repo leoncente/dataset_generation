@@ -246,3 +246,46 @@ class DS_Discrepancies(Base):
     reason = Column(Text)
     mentions_security = Column(Boolean)
     comment = Column(Text)
+
+class DS_Generated_Review(Base):
+    __tablename__ = 'ds_generated_review'
+
+    sha = Column(String, ForeignKey('ds_commit.sha'))
+    model = Column(String)
+    prompt = Column(String)
+    review = Column(Text)
+
+    __table_args__= (
+        PrimaryKeyConstraint('sha', 'model', 'prompt'),
+    )
+
+class DS_Generated_Review_Eval(Base):
+    __tablename__ = 'ds_generated_review_eval'
+
+    sha = Column(String, ForeignKey('ds_commit.sha'))
+    model = Column(String)
+    prompt = Column(String)
+    name = Column(String, ForeignKey('user.name'))
+    coherent = Column(Boolean)
+    vulnerability = Column(Boolean)
+    plausible = Column(Boolean)
+
+    __table_args__= (
+        PrimaryKeyConstraint('sha', 'model', 'prompt', 'name'),
+        ForeignKeyConstraint(['sha', 'model', 'prompt'], ['ds_generated_review.sha', 'ds_generated_review.model', 'ds_generated_review.prompt']),
+    )
+
+class DS_Generated_Review_Discrepancy(Base):
+    __tablename__ = 'ds_generated_review_discrepancy'
+
+    sha = Column(String, ForeignKey('ds_commit.sha'))
+    model = Column(String)
+    prompt = Column(String)
+    coherent = Column(Boolean)
+    vulnerability = Column(Boolean)
+    plausible = Column(Boolean)
+
+    __table_args__= (
+        PrimaryKeyConstraint('sha', 'model', 'prompt'),
+        ForeignKeyConstraint(['sha', 'model', 'prompt'], ['ds_generated_review.sha', 'ds_generated_review.model', 'ds_generated_review.prompt']),
+    )
