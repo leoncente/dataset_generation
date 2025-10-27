@@ -36,7 +36,7 @@ class LLM:
             str: The generated code review from the LLM.
             list[dict]: The prompt used for the generation.
         """
-        commit_text = f'Commit Message: {commit_info['message']}\n\nDiff:\n{commit_info['patch']}'
+        commit_text = f'Commit Message: {commit_info["message"]}\n\nDiff:\n{commit_info["patch"]}'
 
         max_length = 3072
         if prompt['name'] == 'zero-shot':
@@ -66,5 +66,16 @@ class LLM:
         """
         Clean up resources used by the model.
         This method should be called when the model is no longer needed.
+        """
+        pass
+
+    def generate_batch(self, batch_prompts: list[tuple[dict, dict]]) -> str:
+        """
+        Generate responses for a batch of prompts.
+
+        Args:
+            batch_prompts (list[tuple[dict, dict]]): A list of tuples, each containing commit_info and prompt.
+        Returns:
+            str: the reference to the batch job created.
         """
         pass

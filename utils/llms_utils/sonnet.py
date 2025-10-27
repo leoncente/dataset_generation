@@ -1,8 +1,11 @@
 # File to generate code reviews from vulnerability-fixing
 # commits with Anthropic's model with different prompts
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+from anthropic.types.messages.batch_create_params import Request
 from dotenv import load_dotenv
 from .llm import LLM
 import anthropic
+import copy
 import os
 
 class Sonnet(LLM):
@@ -36,3 +39,39 @@ class Sonnet(LLM):
             system=instruction,
         )
         return response.content[0].text if response.content else ""
+
+    def generate_batch(self, batch_prompts: list[tuple[dict, dict]]) -> str:
+        """
+        Generate responses for a batch of prompts.
+
+        Args:
+            batch_prompts (list[tuple[dict, dict]]): A list of tuples containing commit_info and prompt.
+        Returns:
+            str: the reference to the batch job created.
+        """
+        requests = []
+        for commit_info, prompt in batch_prompts:
+            p = copy.deepcopy(prompt)
+            commit_text = f'Commit Message: {commit_info["message"]}\n\nDiff:\n{commit_info["patch"]}'
+
+            for prompt_element in p['prompt']:
+                if prompt_element['role'] == 'user':
+                    prompt_element['content'] = prompt_element['content'].replace('[Insert fix content here]', commit_text)
+
+            input_message = [m for m in p['prompt'] if m.get('role') == 'user']
+            instruction = next((m['content'] for m in p['prompt'] if m.get('role') == 'system'), '')
+
+            requests.append(Request(
+                custom_id=commit_info["sha"],
+                params=MessageCreateParamsNonStreaming(
+                    model=self.model_name,
+                    max_tokens=3072,
+                    messages=input_message,
+                    system=instruction,
+                )
+            ))
+        
+        responses = self.client.messages.batches.create(requests=requests)
+
+        return responses.id
+            

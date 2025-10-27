@@ -121,3 +121,38 @@ class Utils:
         write_json_file("LLMs/Results", f"{sha}.json", commit_info)
 
         return commit_info
+
+    def get_commit_details_by_name(self, owner: str, repo: str, sha: str) -> dict:
+        """
+        Get the commit details for a given SHA.
+
+        Args:
+            owner (str): The owner of the repository.
+            repo (str): The name of the repository.
+            sha (str): The commit SHA.
+        Returns:
+            dict: The commit details.
+        """
+        return get_commit_details(owner, repo, sha)
+
+    def get_vulnerability_commits(self, generated: bool = True, limit: int = 0) -> list[dict]:
+        """
+        Get the vulnerability-fixing commits from the database.
+
+        Args:
+            generated (bool): If True, include those already generated.
+            limit (int): The maximum number of commits to retrieve (0 for no limit).
+        Returns:
+            list[dict]: A list of vulnerability-fixing commit information.
+        """
+        return self.db.get_vulnerability_commits(generated, limit)
+    
+    def save_generated_code_review(self, sha: str, code_review: str):
+        """
+        Save the generated code review to the database.
+
+        Args:
+            sha (str): The commit SHA.
+            code_review (str): The generated code review.
+        """
+        self.db.save_generated_code_review(sha, code_review)
