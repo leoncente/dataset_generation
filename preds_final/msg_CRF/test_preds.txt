@@ -1,0 +1,190 @@
+`running.set(false);` should be inside the `if` block.
+`Math.ceil(maxTermFrequency * (float) maxDoc)` can be replaced with `Math.ceil(maxTermFrequency * (float) maxDoc)`
+I think you mean "if `c+n` will be underflow"?
+You can use `assertTrue(called.get())` here.
+This interface looks like a leftover from an earlier implementation.
+This should also check `breakerSettings.getType()` and throw an exception if it's not the same as `Noop`.
+This needs to be in a `finally` block, otherwise the iterator will be disposed when the iterator is closed.
+Can you remove the debug code?
+The `n > 0` check can be removed now, right?
+use a different variable name for the loop variable
+Please add a `break;` after this `try`.
+should we catch `IllegalArgumentException` here?
+Should these tests use `Mockito.verify` rather than `Mockito.verify`?
+Why are we using `Action0` and `Action1` and `Action2` here?
+You should add `if (interned != null)` to the `if` below.
+Should this be `allocation.getNumberOfInFlightFetch()`?
+You need to unsubscribe from the CompositeSubscription here, otherwise it will be a no-op.
+can't we just call `barrier.await();` here?
+shouldn't this be using `while(!timeout.isZero())`?
+Shouldn't we call the `delegate` here?
+should this be a `sleep`?
+why are we doing this?
+Should this be `AtomicReference.compareAndSet`?
+Shouldn't this be called `close()` as well?
+surely we want to wrap this in a try-with-resources block?
+shouldn't this be `entry.snapshot().equals(snapshot)`?
+You can use `range(start, count - 1)`
+script -> the script itself
+missing `final` on `keystoreName` and `keyStorePassword`?
+I'm wondering if this one should be `protected final`?
+shouldn't this be 100 * 1000 * 1000 ?
+I think we need to add `uncommittedBytes` and `uncommittedOperations` to the description of the PR.
+should we use a CountDownLatch instead of a Thread?
+Should we mark this class as `@Deprecated`?
+`Arrays.stream(nodeChannels.channels).anyMatch(this::isOpen)` is equivalent to `allMatch`.
+I don't think we need this annotation.
+How about using a `Set` for increased performance?
+`async` is not used. How about removing it?
+How about using `Collections.unmodifiableMap(Collections.singletonMap(...))`?
+nit: can drop the `newResponseHeaders.containsKey("Warning")` since it's always true
+why not `newReader = reader.withNewCheckpoint(checkpoint);`
+should we move the client.search(request, this); into the if block?
+package-private instead of "package-private"
+Can we use `AtomicBoolean` instead of `boolean` here?
+I think you may need to check the return value of `get()` as well.
+`if (!inMaintenanceMode || maintenanceModeToChange == false) {` ?
+can be final
+Should we use `Preconditions.checkState` here?
+`>= 1` is a bit redundant, can be just `> 0`
+`or the exception will be non-null`?
+`onFailure` might be a more descriptive name?
+This method is package private, so it's not needed here.
+You should be able to remove the `LocalNodeMasterListener` here, since it's now part of the interface
+`count` and `topHits` can be final.
+can we use `Math.min`/`Math.max` here?
+should be `final`
+This method is not used anywhere so it can be removed.
+`thereafter` -> `after` (one more below as well)
+should we make this `final`?
+if `periodicRechecker.isScheduled() == false`, what does it mean?
+why not just `new String[0]`?
+The variable `reader` is not used in the `try-with-resource` block.
+Why do we need to do this? Can't we just check if `onRejection` is `null`?
+The usage of the counter here seems a bit weird to me. Why not just set the failure count to 0 when the exception is `ResourceNotFoundException`?
+Could be simplified to `if (slot == numberOfJobs)`.
+the method is `synchronized`, why do we need `synchronized` here?
+do we need `synchronized` here? I thought it is only called from a single thread.
+can we use `runnables.add(onCompletion);` here?
+`addTermsAndAlias` -> `addTermsAndAliasForIndex`
+`>= 1` is a no-op.
+can we add a null check to make sure `delegate` is non-null?
+nit: this isn't required
+if the translog size is 1, why do we need to increase it?
+`put` and `delete` operations are not tested in any test.
+Could be a one-liner?
+nit: `relativeTimeInMillis` -> `relativeTime`
+Should we set `isStopping = false;` after this?
+nit: `hasProcessed` -> `hasCompleted`
+I think `onResponse` should be called after `onFailure` is called.
+`if (state.get() != WatcherState.STOPPING)`
+We can use `Exceptions.throwUnsafely()` here.
+Should we use `Exceptions.throwUnsafely()` here?
+`sent` and `request` are both `final`.
+`final` is missing here.
+can we create a SafeCommitInfo from a `long` and then parse it?
+nit: the two lines can be merged
+Should we log something (like "Stopping reindexing due to shutting down") instead?
+I'm not sure if this is the right thing to do. We don't want to reindex the results unless the task is stopped. I think we want to do this only if the task is in progress and not if the task is in progress.
+can you add a check that it's >= 7.3 here?
+shouldn't this be in a `synchronized` block?
+`logger.debug()` on a one-liner please.
+Why does this need to be volatile?
+Shouldn't this be `XPackLicenseState.isAllowedByOperationMode(licenseState.getOperationMode(), License.OperationMode.PLATINUM, false)`?
+`_cat/ml/data_frame/analytics` -> `_cat/ml/data_frame/analytics` ?
+if (delegate == null) { return null; }
+shouldn't this be synchronized as well?
+shouldn't this be synchronized as well?
+can be done in the same thread as the assignment above
+`resolveAutoCreateDataStream` -> `resolveCreateDataStream` ?
+Let's change this to `assertTrue(processorBuffer.size() >= writerBuffer.size());` to make it more obvious that we're asserting the size of the buffers.
+I think this should be `clientSettings` to be consistent with the `clientCache` name.
+`this::cancelOrphanedTasks` should be replaced with `ThreadPool.Names.MANAGEMENT`.
+`from` and `to` should be `final`.
+Should be `getLimit`, not `getLimit`.
+This new method should be added to the interface.
+Maybe rename to `reservedSpace` to indicate that it is a reserved space?
+You need to do the acquire/release in on the listener as well.
+readyToStoreNewModel should be set to false before calling refreshListener.onResponse(null)
+`request` and `response` should be annotated with `@Nullable`
+Can you make this a parameter for `indexRandomDocs`?
+`logger.debug("[{}]", topicName, e)` can be removed
+please use try-with-resources to make sure that `this.client` is closed
+`equals` and `hashCode` are not used in these tests.
+nit: this can be inlined
+Shouldn't this line be: `threadPool.schedule(notifyTimeout, timeout, ThreadPool.Names.GENERIC);`
+maybe we should add a null check on listener here?
+`actionListener.onFailure()` is missing from the `@Override` annotation.
+Shouldn't this be in a `finally { release(threadPool); }`?
+shouldn't this be synchronized as well?
+`IOUtils.closeWhileHandlingException(cacheFile::startEviction);` should be in the `startEviction` method
+`randomPopulateAndReads` does a lot of `notNull()` and `notEmpty()` calls in all the tests. Maybe we can remove them?
+I wonder if we can get away with calling the `onShardResult` method here. It seems like the call to `performPhaseOnShard` is already guarded by the same `boolean canMatch` check.
+Does it need to be synchronized on `shardEvictionsMutex`?
+Do we still need to check `indexState.isIndexUpToDate == false` here?
+Shouldn't this be a `spee != null`?
+Do we need to set this to `false` in the `synchronized` block?
+How about adding a `static final String` constant for `x-elastic-product-origin`?
+Can we add a null check on `httpRequest.content()` for clientStats.requestSizeBytes to prevent NPE?
+You can use `newSize` here instead of `newSize`
+Could be `final`?
+Shouldn't this be after the `content instanceof Releasable` check?
+why not create the recycler in the setUp method?
+`ChangePasswordRequestBuilder` is not used so it can be removed
+Is there a reason this is not using `AtomicLong`?
+the logger is not used anywhere, remove it.
+Should we also close the previous job (even if it was already closed)?
+`GetShardSnapshotRequest` and `GetShardSnapshotAction` can be package-private
+Shouldn't it be `stoppedOrIsolatedBeforeRunning = StoppedOrIsolatedBeforeRunning.STOPPED;`?
+`ts1` and `ts2` can be primitive types.
+nit: I think `stopWatch` is not used
+Why do we need to use an AtomicReference here? Can't we just do `maintenanceTask.error.set(null);`?
+nit: Could just use `this.patterns = autoFollowMetadata.getPatterns()`
+Why not just: return map.getOrDefault(method, null);
+Shouldn't this be `false` as in `EsRejectedExecutionHandler`?
+are you sure you want to use an `AtomicReference` here? Is there a use-case for making it an `AtomicReference`?
+Should we also clear the policy registry when we are deleting the indices?
+`@SuppressWarnings("checkstyle:MissingJavadocMethod")` can be removed from class level
+so what happens when you do this with a regular expression that's not supported by Lucene?
+Should we also close the handler if the reset is in progress?
+assertThat(actualStep.getKey(), equalTo(step.getKey())) may be better
+unnecessary `final` for `bigArraysForMapReduce` and `extractors`
+Consider renaming to `collectRoutingInfo`
+I think it would be better to use `ensureGreen(coldDesiredNode)` here?
+I wonder if we should also check that the block is in the list?
+Can you add a license header?
+I think this should be `Math.toIntExact(newPosition)`
+I don't see why this should be an `AtomicReference`... it looks like it is only used in one place...
+should this be a constant?
+I wonder if `SingleResultDeduplicator` and `ResultDeduplicator` do the same thing?
+Why do we want to return here? Shouldn't we stop accumulating index responses?
+Nit: I think `indexFailures::collect` can be replaced with `indexFailures::report`.
+should we throw an exception in this case?
+`assert previousHeartbeat == null || newHeartBeat.leader().equals(previousHeartbeat.leader());` ?
+`originSettingClient` and `client` are unused in this method.
+The `RetentionLease` already has a `ReplicationResponse` listener, so you don't need to add it here.
+the main difference is that `checkInvokers` doesn't check if `invokers` is empty. I think it should check only if `invokers` is empty.
+`origin_setting_client` is not used anymore
+Shouldn't this be `extends AtomicInteger`?
+can we do this in `release`?
+nit: use `new RequestTrackingHttpChannel(httpChannel)` only once
+Should we do this after `refCounted.decRef()`?
+can this just be `getConnection(node)`?
+should we also add a check that `byteBuf.refCnt() == 0` ?
+I think we need to acquire the write lock here. The only reason we can't use the write lock is to avoid races.
+I wonder if this could be simplified to: ```java return fieldTypeDeduplicator.computeIfAbsent(fieldType, (k) -> new FieldType(k)); ``` `freezeAndDeduplicateFieldType` will first check `if (k == null || k.isEmpty()) { return fieldType; } return fieldType; ```
+should this be `response.isAcknowledged() == true`?
+`Collections.emptyMap()` -> `Collections.emptyMap()`
+should this be `get()` instead of `.value()`?
+Nit: you can use `Long.parseLong()` to get the `long` value instead of `OtelHelper`
+is this change intentional?
+Isn't this `executor.isShutdown()` redundant?
+can be done in the `for` loop
+Can we remove `accumulatedTokensLimit` here, as it's never used?
+Shouldn't we always add the listener after the `ctx.channel().closeFuture()` is done?
+Should we also add the `http2TransportListener` to the `h2StreamChannel` ?
+You could just do this: `return runningTasks.stream().filter(...).findFirst().orElse(null);`
+Why not add a synchronized on this method readChildNodes() as well?
+Can we replace this with `assertFalse(future5.isDone())`?
+One the refreshes ultimately wins?
+should this be `if (!isRunning.get())`?

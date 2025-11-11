@@ -1,0 +1,190 @@
+I don't think this is the right place for this. The rest of the PR is too much, and I don't have a good idea of it.
+I don't think this is the right way to do this. Instead, can we just pass in the `this.terms.isEmpty()` instead?
+Why not just use Math.MAX_VALUE for this?
+Why do we need this change?
+nit: update copyright year in header
+I don't think this is the right place for this, it might be good to move it to the common place it is used.
+What's the difference between `lio.authenticated` and `lio.authenticated` here?
+I don't think this is the right approach. The `if` block of the `else` clause should be inside the `if`.
+Why did you remove this check? Isn't that already covered by the check above?
+I don't think this is the right place to do this. We should be able to just make `position.get()` return `null` if it's not `null`.
+nit: you can merge both lines above as `throw back;` will return the given argument
+You don't need this class, you can just deserialize directly to `TransportService`
+can we use `org.apache.commons.lang3.ObjectUtils` here?
+nit: update copyright year in header
+Shouldn't `internKey` be synchronized as well?
+Wouldn't it be simpler to use `final`s here?
+I don't think this belongs in `OAuth2` class, but it's only used in one place, isn't it? I think it would be better to have two methods, one with the same name and one with the other
+nit: space after `,`
+can we log the failure or log it here?
+It would be nice to have some sort of implementation of this interface. What do you think?
+Can we file a JIRA issue and link it here?
+I don't think this is the right place for this test. I think it should be a separate test and the test should be a separate test.
+I don't think this belongs in `metrics`, it should be in `constants.py`
+I don't think this is the right place for this, I think it should be called `onClose` or something like that.
+I don't think this is the right place for this, it should be called the same way it was before. It should be done in a different PR.
+Shouldn't this be `deleteInProgress`?
+The `else if` should be on a new line
+I don't think the "class" part is necessary.
+I don't think this is the right place for this, it should be `java.io.Closeable`.
+nit: can we call this `isInternalMax` or something like that
+I don't think this test is really testing what we want to do.
+nit: can we call this `prmittedSizeInBytes` for consistency?
+I don't think this belongs in `S3GatewayStoreContainerTests`
+nit: you don't need a space after `,` here and below
+Not sure if this is a good change since it seems unrelated to the rest of the PR.
+You don't need to return anything here, as it is in the superclass.
+Why do we need this `closeChannel` here?
+why don't you use `or` instead of `or` ?
+Shouldn't this be `Collections.emptyMap()`?
+nit: you can merge both lines above as `for` will return the given argument
+I don't think this is the right place to do this. It should be done at the start of the loop in the loop above. It would be better to do it in a try/catch block.
+You don't need the `else` here.
+I don't think we can do this. The nodeSelector can be null, and the nodeSelector can be null. So, the nodeSelector can be null.
+Use `StringUtils.isNullOrEmpty()` instead
+Wouldn't it be better to pass the entire `token` of `token` as an argument to `validate()`?
+Could you please add `@SuppressWarnings("unchecked")` ?
+I don't think that's the right place for this, it's better to just use `org.apache.laystack.Builder`
+why do you need this?
+import * is missing at the top of the file
+_this method is only used in one place, can it be moved to a module/class?
+it is not clear what this method is for
+please add a license header
+Do we need to make it configurable?
+I don't think this is the right place to put this class.
+nit: you can use `assert` instead of `assert`
+nit: `service` -> `service`
+I don't think that's the right fix
+I don't think it's a good idea to import `org.elasticsearch.cluster.service.ClusterService` from `org.elasticsearch.core.ml.job.FailoverService`
+I don't think this import is needed
+This seems to be the only place where we use it, or is there a better way to do it?
+why is this needed?
+I don't think this method should have a default value. It should be set in this case.
+nit: can we use `Collections.emptyList()` here?
+nit: you can use `StringUtils.isAllOrIncrement(new String[]{request, user);`
+nit: you can merge both lines above as `isAllOrIncrement(new String[],request.get())` will return the given argument
+shouldn't this be synchronized as well?
+Why is this change necessary?
+Why is this being removed?
+Would it be worth adding an example here?
+I don't think this is the right place for this, it might be better to make the test a bit more generic, e.g. `org.prestosql.runtime.runtime.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster.cluster
+I don't think this method should be public, since it is only used in one place.
+I don't think this is the right place to do this, it seems like it should be moved out of the `try/catch` block to after the `try/catch` block.
+Why do we need to hardcode this value, can't it just be false by default?
+shouldn't this be `import org.elasticsearch.common.segment.ClusterAction;` ?
+Why is this needed?
+Wouldn't it be better to make this a `ConcurrentHashMap`?
+Wouldn't it be better to return `null` instead of `false` in case of failure?
+Wouldn't it make more sense to throw an exception here instead of silently ignoring it?
+Wouldn't it be easier to just do `(resListener != null);` and then `resListener.onResponse(null);` here?
+I don't think this is the right place for this. It should be called from the constructor. Instead, it should be called from the constructor.
+Is there a reason this was removed? If so, why not just remove it?
+Why not keep the original exception as it was before?
+2 trailing blank lines detected.
+Can we file an issue on this?
+nit: use `Strings.isNullOrEmpty()` instead
+why is this removed?
+Wouldn't it be simpler to do `return (task.isDone()) {`?
+I don't think this is the right place for this. It should already be called when `queue.isDone()` is true.
+why do you need to change this?
+I don't think this is the right place to do this. Instead, remove the loop.
+Is this used?
+`currentRunBucketCount` could be final.
+Shouldn't this logic be inside the `if` block?
+Please use `org.apache.commons.lang3.ObjectUtils`
+I don't think you need to check for null here, if it is not null, just return false.
+nit: update copyright year in header
+nit: update copyright year in header
+I don't think we need to check for null here.
+I don't think you need to check for `false` here. `hasAutoCreateDataStream` already returns a boolean.
+Would it make sense to throw an exception here instead of silently ignoring it?
+Shouldn't this method be renamed to `GoogleCloudStorageClient`?
+I'm not sure this is the right place for it, but I'm wondering if this is the right place for it. What do you think about moving it to a separate method, so that we don't have to pass in a lock here?
+This doesn't look like it's related to this PR, but I don't think it hurts anything to have.
+please sort these alphabetically
+I don't think this is the right place for this. The modelActionListener should either be a list or a list. The modelActionListener should be a list, otherwise it's a list.
+It would be better to rename the variable to something more descriptive.
+Wouldn't it be better to pass the `modelId` as an argument to `train()`?
+Shouldn't we log something here?
+I don't think this class should be in the `service` package, it should be in the `service` package.
+I don't think this is the right fix. If the number of retries is different then it should be the other way around.
+I don't think this import is needed
+I don't think this is used?
+Please use `org.google.elasticsearch.index.WindowMetadataUtils#copyOf`
+Should we log the error and log it?
+Do we need to make this public?
+Why was this removed?
+import * is missing in the IDE
+why is this change in this PR?
+missing '.' at end of line.
+same as above we can from bc not add new annotation
+I don't think this is the right place for this, I don't think it should be in a new class
+@Pearl1594 is there a better way to do this?
+unnecessary change ?
+why did you remove this ?
+Wouldn't it be simpler to do something like `transform.log(node.getVersion().getName()));`?
+shouldn't this be synchronized as well?
+I don't think this is the right place for this code. We should fix it. We should fix it in a separate PR.
+You can use `org.apache.commons.lang3.StringUtils#isBlank` here.
+Why was this removed?
+Why not use the new one here?
+nit: you can merge both lines above as `toClose` will return the given argument
+This should be split across multiple lines.
+I don't think this import is needed
+Wouldn't it be easier to do something like `EMPTY_DIRECT_NO_OPS_PERFORITE` or something like that?
+I don't think this import is needed
+Can we have a test for this as well?
+I don't think this import is needed
+Why do we need to check for null here?
+No need for an empty line here.
+Wouldn't it be simpler to do this as an `if` statement instead of the `else` block?
+Do we want to expose this to all users? I feel like it might be a good idea to implement it in the future.
+Why do we need to set the `keySet()` here?
+Avoid deeply nested control flow statements.
+Shouldn't this be `true` to ensure the thread is closed?
+I don't think this method should be public anymore.
+I don't think this is the right place for this, is there a better way to do this?
+I don't see where it is used?
+I don't think this is the right fix. It should have `@Restricted(NoExternalUse.class)`
+Shouldn't we log something here?
+Do we need a test for this?
+I don't think this is used?
+I'm not sure if this is the right error message. It might be useful to say in the case where an error occurs and has been logged.
+nit: can you move this to the top of the file?
+nit: you can merge both lines above as `log`.
+Please use `import org.apache.hadoop.commons.runtime.extension.jdbcs;`
+I don't think this is the right way to do this. I think it would be better to do this in the `if (newPosition > Integer.MAX_VALUE) {` block.
+nit: can we call it `AtomicReference` ?
+Shouldn't this be configurable?
+Why do we need this? It seems we don't need it, isn't it? If it is the case we don't need it, right?
+nit: you can merge both lines above as `close` will return the given argument
+The `fieldCapable` should be moved to a new line.
+I don't think this import is needed
+I'm not sure this test is actually testing what it does, but it seems to me like it should be moved out of the `finally` block?
+This import seems unused. Can we remove it?
+Wouldn't it be better to have a `SeqNo`, and a `SeqNo` that returns a `SeqNo` instead of a `SeqNo`?
+please add a space before `,`
+I don't think there should be a license header here.
+I don't think this is the right place for this class.
+Wouldn't it be simpler to do something like `snapshotIndex` and then `snapshotIndex`?
+Shouldn't we use `close` here?
+Shouldn't this be `null`?
+Why do we need to create a new instance every time this method is called?
+Why not use `Collections.emptyMap()`?
+This is the fix.
+I don't think it's safe to do this, since it makes the code harder to read.
+Wouldn't it make more sense to move this `if` inside the `finally` block?
+This class is now unused and can be removed.
+nit: can we use `org.apache.commons.lang3.StringUtils` here?
+nit: you can merge both lines above as `checkNotNull` will return the given argument
+and this one?
+Wouldn't it be better to use `Objects.isShutdown() == false` ?
+I don't think this should be a part of this PR, but I think it should be a separate PR.
+I don't think this belongs in the interface, it should be in the interface, not in the interface.
+Why do we need to close the `Http2TransportListener` here?
+Why do we need to close the `Http2TransportListener.onStreamClosed()` call here?
+I'm not sure if this is the right place for it, but I'm wondering if it would make more sense to have an event in the service, not just an event. What do you think?
+Shouldn't this be `synchronized(this)`?
+Wouldn't it be better to use `assertTrue` instead of `assertTrue`?
+Would it be possible to have a test for this?
+Do we want to log or fail here?
